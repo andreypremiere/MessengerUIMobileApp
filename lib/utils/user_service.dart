@@ -1,7 +1,6 @@
 import 'dart:convert';
 
 import 'package:messenger_ui/models/user.dart';
-import 'package:messenger_ui/utils/stdout_message.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class UserSession {
