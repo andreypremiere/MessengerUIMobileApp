@@ -5,6 +5,7 @@ import 'package:flutter/services.dart';
 import 'package:http/http.dart' as http;
 import 'package:messenger_ui/styles/app_styles.dart';
 import 'package:messenger_ui/utils/auth_service.dart';
+import 'package:messenger_ui/utils/routes_backend.dart';
 import 'package:messenger_ui/utils/stdout_message.dart';
 import 'package:messenger_ui/utils/user_service.dart';
 
@@ -59,7 +60,7 @@ class _CodePageState extends State<CodePage> {
 
     try {
       final response = await http.post(
-        Uri.parse('http://192.168.0.102:8000/verify_user_by_id'),
+        Uri.parse(RoutesBackend.verifyUserById),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({'user_id': userId, 'code': text}),
       );

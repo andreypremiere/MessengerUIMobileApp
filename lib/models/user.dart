@@ -4,7 +4,7 @@ class User {
   final String email;
   final String numberPhone;
   final String? displayedNickname;
-  final DateTime lastEnter;
+  final DateTime? lastEnter;
 
   User({
     required this.userId,
@@ -12,7 +12,7 @@ class User {
     required this.email,
     required this.numberPhone,
     this.displayedNickname,
-    required this.lastEnter,
+    this.lastEnter,
   });
 
   factory User.fromJson(Map<String, dynamic> json) {
@@ -22,7 +22,9 @@ class User {
       email: json['email'],
       numberPhone: json['number_phone'],
       displayedNickname: json['displayed_nickname'],
-      lastEnter: DateTime.parse(json['last_enter']),
+      lastEnter: json['last_enter'] != null
+        ? DateTime.parse(json['last_enter'])
+        : null,
     );
   }
 
@@ -33,7 +35,7 @@ class User {
       'email': email,
       'number_phone': numberPhone,
       'displayed_nickname': displayedNickname,
-      'last_enter': lastEnter.toIso8601String(),
+      'last_enter': lastEnter?.toIso8601String(),
     };
   }
 

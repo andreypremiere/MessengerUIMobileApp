@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:messenger_ui/models/user.dart';
+import 'package:messenger_ui/utils/routes_backend.dart';
 import 'package:messenger_ui/utils/stdout_message.dart';
 import 'package:messenger_ui/utils/user_service.dart';
 
@@ -143,7 +144,7 @@ class _LoginFormState extends State<LoginForm> {
 
     try {
       final response = await http.post(
-        Uri.parse('http://192.168.0.102:8000/authenticate_user_by_any'),
+        Uri.parse(RoutesBackend.authenticateUserByAny),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({"value": text}),
       );
@@ -247,8 +248,73 @@ class _LoginFormState extends State<LoginForm> {
   }
 }
 
-class RegisterForm extends StatelessWidget {
-  const RegisterForm({super.key});
+class RegisterForm extends StatefulWidget{
+  @override
+  State<StatefulWidget> createState() {
+    return RegisterFormState();
+  }
+
+}
+
+class RegisterFormState extends State<RegisterForm> {
+  final TextEditingController _controllerNumberPhone = TextEditingController();
+  final TextEditingController _controllerEmail = TextEditingController();
+  final TextEditingController _controllerNickname = TextEditingController();
+
+  bool _isLoading = false;
+  UserSession userSession = UserSession();
+
+  Future<void> _sendRequest() async {
+    if (_isLoading) return;
+
+    setState(() {
+      _isLoading = true;
+    });
+
+    final numberPhone = _controllerNumberPhone.text.trim();
+    final email = _controllerEmail.text.trim();
+    final nickname = _controllerNickname.text.trim();
+
+    if (numberPhone.isEmpty || email.isEmpty || nickname.isEmpty) {
+      printColorMessage('Поле ввода пустое');
+      setState(() => _isLoading = false);
+      return;
+    }
+
+    try {
+      final response = await http.post(
+        Uri.parse(RoutesBackend.createUser),
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode({"unique_nickname": nickname,
+        "email": email, "number_phone": numberPhone}),
+      );
+
+      if (response.statusCode == 200 && response.body.isNotEmpty) {
+        final data = jsonDecode(response.body);
+        User? user;
+        try {
+          user = User.fromJson(data);
+          userSession.saveUser(user);
+          printColorMessage('Вход выполнен: ${user.toString()}');
+          nextPage();
+        } catch (e) {
+          printColorMessage('Ошибка при парсинге: $e');
+        }
+      } else {
+        printColorMessage('Ошибка: ${response.statusCode}');
+      }
+    } catch (e) {
+      printColorMessage('Ошибка соединения: $e');
+    }
+
+    setState(() {
+      _isLoading = false;
+    });
+  }
+
+  void nextPage() {
+    Navigator.pushNamed(context, '/code_page');
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -271,6 +337,7 @@ class RegisterForm extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
           TextField(
+            controller: _controllerNumberPhone,
             decoration: InputDecoration(
               hintText: 'Номер телефона',
               enabledBorder: OutlineInputBorder(
@@ -291,6 +358,7 @@ class RegisterForm extends StatelessWidget {
             ),
           ),
           TextField(
+            controller: _controllerEmail,
             decoration: InputDecoration(
               hintText: 'Электронная почта',
               enabledBorder: OutlineInputBorder(
@@ -311,6 +379,7 @@ class RegisterForm extends StatelessWidget {
             ),
           ),
           TextField(
+            controller: _controllerNickname,
             decoration: InputDecoration(
               hintText: 'Никнейм',
               enabledBorder: OutlineInputBorder(
@@ -339,7 +408,9 @@ class RegisterForm extends StatelessWidget {
                 borderRadius: BorderRadius.circular(12), // скругление углов
               ),
             ),
-            onPressed: () {},
+            onPressed: () {
+              _sendRequest();
+            },
             child: Text(
               'Зарегистрироваться',
               style: TextStyle(fontFamily: 'Inter', fontSize: 16),

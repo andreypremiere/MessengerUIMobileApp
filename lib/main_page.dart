@@ -1,9 +1,13 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:messenger_ui/elements/list_chats_widget.dart';
+import 'package:messenger_ui/elements/list_search_widget.dart';
 import 'package:messenger_ui/elements/search_stroke.dart';
 import 'package:messenger_ui/styles/app_styles.dart';
+import 'package:messenger_ui/utils/auth_service.dart';
 import 'package:messenger_ui/utils/stdout_message.dart';
+import 'package:messenger_ui/utils/user_service.dart';
 
 class MainPage extends StatefulWidget {
   const MainPage({super.key});
@@ -51,6 +55,12 @@ class _MainPageState extends State<MainPage> {
   void _clearInput() {
     FocusScope.of(context).unfocus();
     setState(() {});
+  }
+
+  void _logout() {
+    AuthService().clearToken();
+    UserSession().clearUser();
+    Navigator.pushReplacementNamed(context, '/auth');
   }
 
   @override
@@ -112,7 +122,14 @@ class _MainPageState extends State<MainPage> {
                 ),
 
                 /// Содержимое основной страницы
-                Expanded(child: Center(child: Text("Это основной контент"))),
+                Expanded(
+                  child: SingleChildScrollView(
+                    scrollDirection: Axis.vertical,
+                    child: !_isFocused
+                        ? ListChatshWidget()
+                        : ListSearchWidget(),
+                  ),
+                ),
               ],
             ),
 
@@ -131,7 +148,7 @@ class _MainPageState extends State<MainPage> {
               bottom: 0,
               width: 250,
               child: Container(
-                color: const Color.fromARGB(220, 255, 255, 255),
+                color: const Color.fromARGB(255, 255, 255, 255),
                 padding: const EdgeInsets.symmetric(
                   vertical: 20,
                   horizontal: 20,
@@ -150,11 +167,11 @@ class _MainPageState extends State<MainPage> {
                         borderRadius: BorderRadius.circular(50),
                         child: CachedNetworkImage(
                           // color: Colors.blueAccent,
-                          fit: BoxFit.fill,
+                          fit: BoxFit.fitHeight,
                           width: 100,
                           height: 100,
                           imageUrl:
-                              "https://storage.yandexcloud.net/storage-avatars/742b026f-4039-4243-a154-807e5dec5ba0_big",
+                              "https://avatars.mds.yandex.net/get-mpic/5366523/2a0000018c2905e8ad28c089c633138c8e02/orig",
                           placeholder: (context, url) =>
                               CircularProgressIndicator(),
                           errorWidget: (context, url, error) =>
@@ -162,7 +179,7 @@ class _MainPageState extends State<MainPage> {
                         ),
                       ),
                     ),
-                    SizedBox(height: 20,),
+                    SizedBox(height: 20),
                     Expanded(
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -244,7 +261,7 @@ class _MainPageState extends State<MainPage> {
                               ),
                             ),
                             onPressed: () {
-                              printColorMessage("Выход");
+                              _logout();
                             },
                             child: const Text(
                               "Выход",
