@@ -1,11 +1,16 @@
+import 'dart:convert';
+
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:http/http.dart' as http;
 import 'package:messenger_ui/elements/list_chats_widget.dart';
 import 'package:messenger_ui/elements/list_search_widget.dart';
 import 'package:messenger_ui/elements/search_stroke.dart';
+import 'package:messenger_ui/models/chat.dart';
 import 'package:messenger_ui/styles/app_styles.dart';
 import 'package:messenger_ui/utils/auth_service.dart';
+import 'package:messenger_ui/utils/routes_backend.dart';
 import 'package:messenger_ui/utils/stdout_message.dart';
 import 'package:messenger_ui/utils/user_service.dart';
 
@@ -23,6 +28,7 @@ class _MainPageState extends State<MainPage> {
   final TextEditingController _searchController = TextEditingController();
   final FocusNode _focusNode = FocusNode();
   bool _isFocused = false;
+  List _findedUsers = [];
 
   @override
   void initState() {
@@ -54,13 +60,46 @@ class _MainPageState extends State<MainPage> {
 
   void _clearInput() {
     FocusScope.of(context).unfocus();
+    _searchController.clear();
+    _findedUsers.clear();
     setState(() {});
   }
 
   void _logout() {
     AuthService().clearToken();
     UserSession().clearUser();
-    Navigator.pushReplacementNamed(context, '/auth');
+    Navigator.pushNamedAndRemoveUntil(context, '/auth', (route) => false);
+  }
+
+  Future<void> _searchUsers() async {
+    String? token = AuthService().token;
+
+    try {
+      final response = await http.post(
+        Uri.parse(RoutesBackend.findUserByAny),
+        headers: {'Content-type': 'application/json', 'Authorization': token!},
+        body: jsonEncode({
+          "value": _searchController.text.trim()
+        })
+      );
+
+      if (response.statusCode == 200 && response.body.isNotEmpty) {
+        final List<dynamic> data = jsonDecode(response.body);
+
+        try {
+          setState(() {
+            _findedUsers.clear();
+            _findedUsers.addAll(
+              data.map((e) => UserChat.fromJson(e as Map<String, dynamic>)),
+            );
+          });
+        } catch (e) {
+          printColorMessage('Ошибка во время парса результата $e');
+        }
+      }
+    } catch (e) {
+      printColorMessage('Ошибка при выполнении запроса поиска пользователей');
+    }
   }
 
   @override
@@ -114,6 +153,8 @@ class _MainPageState extends State<MainPage> {
                           child: SearchStroke(
                             controller: _searchController,
                             focusNode: _focusNode,
+                            searchUsers: _searchUsers,
+                            findedUsers: _findedUsers,
                           ),
                         ),
                       ),
@@ -127,7 +168,7 @@ class _MainPageState extends State<MainPage> {
                     scrollDirection: Axis.vertical,
                     child: !_isFocused
                         ? ListChatshWidget()
-                        : ListSearchWidget(),
+                        : ListSearchWidget(findedUsers: _findedUsers,),
                   ),
                 ),
               ],

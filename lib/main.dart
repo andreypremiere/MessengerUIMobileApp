@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:messenger_ui/authorization_page.dart';
+import 'package:messenger_ui/chat_page.dart';
 import 'package:messenger_ui/code_page.dart';
 import 'package:messenger_ui/main_page.dart';
 import 'package:messenger_ui/utils/stdout_message.dart';
@@ -30,6 +31,7 @@ class MyApp extends StatelessWidget {
         '/auth': (context) => const AuthorizationPage(),
         '/main': (context) => const MainPage(),
         '/code_page': (context) => const CodePage(),
+        '/chat_page': (context) => ChatPage()
       },
     );
   }
@@ -41,31 +43,31 @@ class StartPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      _navigateAfterDelay(context);
+      // _navigateAfterDelay(context);
 
-      // final isLoggedIn = AuthService().isLoggedIn;
-      // if (isLoggedIn) {
-      //   Navigator.pushReplacementNamed(context, '/main');
-      // } else {
-      //   Navigator.pushReplacementNamed(context, '/auth');
-      // }
-    });
-
-    return const Scaffold(body: Center(child: CircularProgressIndicator()));
-  }
-
-  void _navigateAfterDelay(BuildContext context) async {
-    // Планируем выполнение после построения UI, чтобы избежать ошибки навигации до рендеринга
-    WidgetsBinding.instance.addPostFrameCallback((_) async {
-      await Future.delayed(const Duration(seconds: 1)); // Ждём 5 секунд
-
-      final isLoggedIn = AuthService().isLoggedIn; // Проверка авторизации
-
+      final isLoggedIn = AuthService().isLoggedIn;
       if (isLoggedIn) {
         Navigator.pushReplacementNamed(context, '/main');
       } else {
         Navigator.pushReplacementNamed(context, '/auth');
       }
     });
+
+    return const Scaffold(body: Center(child: CircularProgressIndicator()));
   }
+
+  // void _navigateAfterDelay(BuildContext context) async {
+  //   // Планируем выполнение после построения UI, чтобы избежать ошибки навигации до рендеринга
+  //   WidgetsBinding.instance.addPostFrameCallback((_) async {
+  //     await Future.delayed(const Duration(seconds: 1)); // Ждём 5 секунд
+
+  //     final isLoggedIn = AuthService().isLoggedIn; // Проверка авторизации
+
+  //     if (isLoggedIn) {
+  //       Navigator.pushReplacementNamed(context, '/main');
+  //     } else {
+  //       Navigator.pushReplacementNamed(context, '/auth');
+  //     }
+  //   });
+  // }
 }

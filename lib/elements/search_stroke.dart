@@ -1,11 +1,21 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:messenger_ui/styles/app_styles.dart';
+
 
 class SearchStroke extends StatefulWidget {
   final TextEditingController controller;
   final FocusNode focusNode;
+  final Function searchUsers;
+  final List findedUsers;
 
-  SearchStroke({required this.controller, required this.focusNode});
+  SearchStroke({
+    required this.controller,
+    required this.focusNode,
+    required this.searchUsers,
+    required this.findedUsers
+  });
 
   @override
   State<StatefulWidget> createState() {
@@ -14,6 +24,25 @@ class SearchStroke extends StatefulWidget {
 }
 
 class _SearchStrokeState extends State<SearchStroke> {
+  Timer? _debounce;
+
+  void _search() {
+    if (widget.controller.text.trim().isEmpty) {
+      widget.findedUsers.clear();
+      return;
+    }
+    else {
+      widget.searchUsers();
+    }
+  }
+
+  void onTextChanged() {
+  _debounce?.cancel();
+
+  _debounce = Timer(const Duration(seconds: 1), () {
+   _search();
+  });
+}
 
   @override
   Widget build(BuildContext context) {
@@ -31,6 +60,10 @@ class _SearchStrokeState extends State<SearchStroke> {
         borderRadius: BorderRadius.circular(10),
       ),
       child: TextField(
+        onChanged: (value) {
+          // widget.searchUsers();
+          onTextChanged();
+        },
         controller: widget.controller,
         focusNode: widget.focusNode,
         style: TextStyle(

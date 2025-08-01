@@ -37,6 +37,7 @@ dependencies:
   cached_network_image: ^3.3.1
   cupertino_icons: ^1.0.8
   shared_preferences: ^2.5.3
+  web_socket_channel: ^3.0.3
   
 
 dev_dependencies:
@@ -58,6 +59,7 @@ flutter:
   assets: 
     - assets/icons/burger.svg
     - assets/icons/arrow_back.svg
+    - assets/icons/send_message.svg
   # The following line ensures that the Material Icons font is
   # included with your application, so that you can use the icons in
   # the material Icons class.

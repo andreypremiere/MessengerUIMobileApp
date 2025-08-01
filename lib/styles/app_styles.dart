@@ -4,7 +4,7 @@ class AppColors {
   static const Color mainBackground = Color(0xFFF5FCFF);
   static const Color mainButton = Color(0xFF00A6FF);
   static const Color mainBlueIcon = Color(0xFFABE2FF);
-  static const Color mainBackgroundChat = Color(0xFFABE2FF);
+  static const Color mainBackgroundChat = Color.fromARGB(255, 190, 229, 250);
   static const Color messageBackground = Color(0xFFD7F7FF);
   static const Color borderInput = Color(0xFFD2D2D2);
   static const Color textBlack = Color(0xFF3F3F3F);

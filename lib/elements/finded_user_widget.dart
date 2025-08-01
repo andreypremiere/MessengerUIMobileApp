@@ -2,27 +2,27 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:messenger_ui/models/chat.dart';
 
-class ChatWidget extends StatefulWidget {
-  late var chat;
+class FindedUserWidget extends StatefulWidget {
+  late var user;
 
-  ChatWidget({super.key, required this.chat});
+  FindedUserWidget({required this.user});
 
 
   @override
   State<StatefulWidget> createState() {
-    return _ChatWidget();
+    return _FindedUserWidget();
   }
 }
 
-class _ChatWidget extends State<ChatWidget> {
+class _FindedUserWidget extends State<FindedUserWidget> {
   @override
   Widget build(BuildContext context) {
     return  GestureDetector(
       onTap: () {
-        Navigator.pushNamed(context, '/chat_page',
-        arguments: {
-          'chat': widget.chat
-        });
+        // Navigator.pushNamed(context, '/chat_page',
+        // arguments: {
+        //   'chat': widget.chat
+        // });
       },
       child: Container(
         decoration: BoxDecoration(
@@ -55,7 +55,7 @@ class _ChatWidget extends State<ChatWidget> {
             ),
             SizedBox(width: 10),
             Text(
-              widget.chat?.name,
+              widget.user?.displayedNickname,
               style: TextStyle(
                 fontFamily: 'Inter',
                 fontSize: 16,

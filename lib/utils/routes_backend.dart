@@ -10,4 +10,6 @@ class RoutesBackend {
       'http://${RoutesBackend.baseURL}/authenticate_user_by_any';
   static const String findUserByAny =
       'http://${RoutesBackend.baseURL}/find_users_by_value';
+  static const String getUserChats =
+      'http://${RoutesBackend.baseURL}/get_user_chats';
 }
